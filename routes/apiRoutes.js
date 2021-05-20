@@ -1,23 +1,33 @@
 const router = require('express').Router();
-const Exercise = require('../models/Exercise');
 const Workout = require('../models/Workout');
 
 router.get('/workouts', async (req, res) => {
-  const workoutData = await Workout.find({}).sort({ day: -1 }).limit(1);
-  console.log('--------------- GET /workouts -----------------');
-  console.log(workoutData);
-  res.json(workoutData);
-  // Workout.find({})
-  //   .sort({ day: -1 })
-  //   .limit(1, (err, data) => {
-  //     err ? console.log(err) : res.json(data);
-  //     console.log(data);
-  //   });
+  try {
+    const workoutData = await Workout.aggregate([
+      {
+        $addFields: {
+          totalDuration: { $sum: '$exercises.duration' },
+        },
+      },
+    ]);
+
+    // console.log('--------------- GET /workouts -----------------');
+    // console.log(workoutData);
+    res.json(workoutData);
+  } catch (err) {
+    res.status(400).json(err.message);
+  }
 });
 
 router.get('/workouts/range', async (req, res) => {
   try {
-    const workoutData = await Workout.find();
+    const workoutData = await Workout.aggregate([
+      {
+        $addFields: {
+          totalDuration: { $sum: '$exercises.duration' },
+        },
+      },
+    ]);
     console.log(workoutData);
     res.json(workoutData);
   } catch (err) {
@@ -31,16 +41,13 @@ router.get('/workouts/range', async (req, res) => {
 
 router.put('/workouts/:id', async (req, res) => {
   try {
-    const data = req.body;
-    console.log(data);
-    const exerciseData = await Exercise.create(data);
     const workoutData = await Workout.findOneAndUpdate(
       { _id: req.params.id },
-      { $push: { exercises: exerciseData } },
+      { $push: { exercises: req.body } },
       { new: true }
     );
-    console.log('------------ Exercise ------------');
-    console.log(exerciseData);
+    // console.log('------------ Exercise ------------');
+    // console.log(exerciseData);
     console.log('------------ Workout ------------');
     console.log(workoutData);
     res.json(workoutData);
