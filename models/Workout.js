@@ -1,7 +1,10 @@
+// importing mongoose and mongoose shema
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+// creating a new workoutSchema collection
 const workoutSchema = new Schema({
+  // defining properties within the document
   day: {
     type: Date,
     default: Date.now,
@@ -38,6 +41,7 @@ const workoutSchema = new Schema({
   ],
 });
 
+// converting schema into a model
 const Workout = mongoose.model('Workout', workoutSchema);
 
 module.exports = Workout;
