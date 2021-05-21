@@ -22,15 +22,6 @@ router.get('/workouts', async (req, res) => {
 // getting workout data for graphs on workout dashboard
 router.get('/workouts/range', async (req, res) => {
   try {
-    // // setting starting date for date range (current day -7)
-    // let start = new Date();
-    // start.setDate(start.getDate() - 7);
-
-    // // setting ending date for date range (current day)
-    // let end = new Date();
-    // end.setDate(end.getDate());
-
-    // getting a range of data that matches the date range specified and then adding field for totalDuration sum of all exercise durations
     const workoutData = await Workout.aggregate([
       // sorting data in from most recent to oldest
       {
