@@ -32,21 +32,18 @@ router.get('/workouts/range', async (req, res) => {
 
     // getting a range of data that matches the date range specified and then adding field for totalDuration sum of all exercise durations
     const workoutData = await Workout.aggregate([
+      // sorting data in from most recent to oldest
       {
-        // getting data from a date range
-        $match: {
-          day: {
-            $gte: start,
-            $lte: end,
-          },
-        },
+        $sort: { $natural: -1 },
       },
+      // adding totalDuration field for each days total workout duration
       {
         $addFields: {
           totalDuration: { $sum: '$exercises.duration' },
         },
       },
-    ]);
+      // limiting results to 7 entries
+    ]).limit(7);
     res.json(workoutData);
   } catch (err) {
     res.status(400).json(err.message);
